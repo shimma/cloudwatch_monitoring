@@ -99,33 +99,6 @@ end
 
 options = ['--from-cron'] + node[:cw_mon][:options]
 
-if iam_role = IAM::role
-  log "IAM role available: #{iam_role}"
-else
-  log "no IAM role available. CloudWatch Monitoring scripts will use IAM user #{node[:cw_mon][:user]}" do
-    level :warn
-  end
-  vars = {}
-  begin
-    user_creds = Chef::EncryptedDataBagItem.load(node[:cw_mon][:aws_users_databag], node[:cw_mon][:user])
-    vars[:access_key_id] = user_creds['access_key_id']
-    vars[:secret_access_key] = user_creds['secret_access_key']
-    log "AWS key for user #{ node[:cw_mon][:user]} found in databag #{node[:cw_mon][:aws_users_databag]}"
-  rescue
-    vars =node[:cw_mon]
-  end
-
-  template "#{install_path}/awscreds.conf" do
-    owner node[:cw_mon][:user]
-    group node[:cw_mon][:group]
-    mode 0644
-    source 'awscreds.conf.erb'
-    variables :cw_mon => vars
-  end
-
-  options << "--aws-credential-file #{install_path}/awscreds.conf"
-end
-
 cron_d 'cloudwatch_monitoring' do
   minute "*/#{node[:cw_mon][:cron_minutes]}"
   user node[:cw_mon][:user]

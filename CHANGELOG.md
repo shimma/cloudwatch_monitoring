@@ -2,6 +2,9 @@
 
 This file is used to list changes made in each version of cloudwatch_monitoring.
 
+## 1.2.1:
+* update cookbook with the latest script path & remove IAM velification
+
 ## 1.2.0:
 * query instance metadata to get instance role instead of EC2 Ohai attribute.
 
